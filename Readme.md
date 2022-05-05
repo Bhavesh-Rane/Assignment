@@ -110,3 +110,64 @@ Command: docker-compose up -d
 
 Step 5: Access the application at http://localhost:9393/
 Application is now accessible on web.
+
+
+Part III
+
+Step 1: Stop the running container
+Syntax: docker stop <container ID>
+In my case no active container was there
+
+
+Step 2: Pull the Prometheus image 
+Command: docker pull prom/prometheus:v2.22.0
+
+
+Step 3: Add Prometheus container (prom/prometheus:v2.22.0) to the docker-compose.yaml form part II 
+Compose file:
+
+version: '3.7'
+services:
+  csvserver:
+    image: infracloudio/csvserver:latest 
+    volumes:
+      - .\InputFile:/csvserver/inputdata
+    ports:
+      - 9393:9300
+    environment:
+      - CSVSERVER_BORDER=Orange
+  prometheus:
+    image: prom/prometheus:v2.22.0
+    ports:
+      - 9090:9090
+    volumes:
+      - .\prometheus.yml:/etc/prometheus/prometheus.yml
+
+
+Step 4: Extract & run the prometheus application. 
+It should be accessible at http://localhost:9090/
+
+Step 5: Edit the prometheus.yml file to make docker as target Prometheus config file:
+
+scrape_configs:
+
+  - job_name: "prometheus"
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "Docker"
+    static_configs:
+      - targets: ["host.docker.internal:9393"]
+
+
+
+Step 6: Once the prometheus is accessible from browser go to stats --> target. 
+Here we can see the docker machine as the endpoint
+
+
+Step 7: Come back to main prometheus page, search for "csvserver_records" in the query box & Eecute.
+
+
+Step 8: Select graph view you can see a straight line as s graph. 
+If not seen consider shrinking the time range to 5m
