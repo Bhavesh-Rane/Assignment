@@ -78,5 +78,35 @@ Step 11: Access the application at http://localhost:9393/
 Application is now accessible on web.
 
 
+Part II
+
+Step 1: Stop the running container
+Syntax: docker stop <container ID>
+Command: docker stop df74039dda30
 
 
+Step 2: Delete any containers running from the last part
+Syntax: docker container rm <container ID>
+Command: docker container rm df74039dda30
+
+Step 3: Create a docker-compose.yaml 
+
+Compose file :
+
+version: '3.7'
+services:
+  csvserver:
+    image: infracloudio/csvserver:latest 
+    volumes:
+      - .\InputFile:/csvserver/inputdata
+    ports:
+      - 9393:9300
+    environment:
+      - CSVSERVER_BORDER=Orange
+
+
+Step 4: Run the docker compose
+Command: docker-compose up -d
+
+Step 5: Access the application at http://localhost:9393/
+Application is now accessible on web.
